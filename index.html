@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ဖောက်သည် အချက်အလက် ဖြည့်သွင်းရန်</title>
+<style>
+:root{
+  --brand:#0d9488; --brand-2:#0f766e; --brand-soft:#ccfbf1;
+  --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#eef2f6;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+  --radius:16px; --shadow:0 10px 30px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Pyidaungsu","Noto Sans Myanmar","Myanmar Text",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65}
+.hidden{display:none !important}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* LOGIN */
+#loginScreen{align-items:center;justify-content:center;padding:24px;
+  background:linear-gradient(160deg,#0f766e 0%,#0d9488 45%,#14b8a6 100%)}
+.login-card{width:100%;max-width:400px;background:#fff;border-radius:22px;
+  padding:34px 24px 28px;box-shadow:0 24px 60px rgba(0,0,0,.25);text-align:center}
+.logo{width:66px;height:66px;margin:0 auto 14px;border-radius:20px;
+  display:grid;place-items:center;font-size:32px;background:var(--brand-soft)}
+.login-card h1{font-size:19px;margin:0 0 6px;font-weight:700}
+.login-card p{margin:0 0 22px;color:var(--muted);font-size:14px}
+#codeInput{width:100%;padding:16px;font-size:26px;letter-spacing:12px;text-align:center;
+  border:2px solid var(--line);border-radius:14px;outline:none;font-family:inherit;
+  font-weight:700;transition:.2s;background:#f8fafc}
+#codeInput:focus{border-color:var(--brand);background:#fff;
+  box-shadow:0 0 0 4px rgba(13,148,136,.12)}
+#loginError{margin-top:12px;color:var(--danger);font-size:14px;font-weight:600;
+  background:#fef2f2;border-radius:10px;padding:9px}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;
+  padding:16px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:20;box-shadow:0 4px 18px rgba(15,118,110,.3)}
+.topbar .title{font-weight:700;font-size:16px}
+.logout{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);
+  padding:7px 14px;border-radius:10px;font-size:13px;font-family:inherit;cursor:pointer}
+.logout:active{background:rgba(255,255,255,.3)}
+
+/* CARD */
+.wrap{padding:16px 14px 130px;max-width:640px;margin:0 auto;width:100%}
+.card{background:#fff;border-radius:var(--radius);padding:18px;
+  box-shadow:var(--shadow);margin-bottom:14px}
+.card-title{font-size:14px;font-weight:700;color:var(--brand-2);
+  margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:"";width:4px;height:16px;border-radius:3px;background:var(--brand)}
+
+.lbl{display:block;font-size:14px;font-weight:600;margin-bottom:8px;color:#334155}
+.lbl .req{color:var(--danger);margin-left:2px}
+.lbl .opt{color:var(--muted);font-weight:500;font-size:12px}
+input[type=text]{width:100%;padding:14px 15px;border:2px solid var(--line);
+  border-radius:12px;font-size:16px;font-family:inherit;outline:none;
+  background:#f8fafc;transition:.2s}
+input[type=text]:focus{border-color:var(--brand);background:#fff;
+  box-shadow:0 0 0 4px rgba(13,148,136,.1)}
+input[type=text].error{border-color:var(--danger);background:#fef2f2;
+  box-shadow:0 0 0 4px rgba(220,38,38,.1)}
+
+.name-error{display:flex;align-items:flex-start;gap:8px;margin-top:10px;
+  padding:11px 13px;background:#fef2f2;border:1px solid #fecaca;
+  border-radius:11px;color:#991b1b;font-size:13.5px;font-weight:600;
+  animation:shake .4s ease}
+.name-error .ic{font-size:16px;line-height:1.2;flex:0 0 auto}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
+}
+
+/* UPLOAD */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.upload{display:flex;align-items:center;gap:12px;padding:16px 15px;
+  border:2px dashed #cbd5e1;border-radius:14px;background:#f8fafc;
+  cursor:pointer;transition:.2s}
+.upload:active{transform:scale(.99)}
+.upload:hover{border-color:var(--brand);background:#f0fdfa}
+.upload.filled{border-style:solid;border-color:var(--ok);background:#f0fdf4}
+.upload .ico{width:42px;height:42px;flex:0 0 42px;border-radius:12px;display:grid;
+  place-items:center;background:var(--brand-soft);font-size:20px}
+.upload.filled .ico{background:#dcfce7}
+.upload .meta{flex:1;min-width:0}
+.upload .meta strong{display:block;font-size:14px;font-weight:600;color:#334155}
+.upload .meta small{display:block;font-size:12px;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+
+.upload.face{border-color:#fbcfe8;background:#fdf2f8}
+.upload.face:hover{border-color:#ec4899;background:#fce7f3}
+.upload.face.filled{border-color:var(--ok);background:#f0fdf4}
+.upload.face .ico{background:#fce7f3;color:#be185d}
+
+.preview{margin-top:10px;display:flex;gap:10px;align-items:center;
+  background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px}
+.preview img{width:64px;height:64px;object-fit:cover;border-radius:9px;border:1px solid var(--line)}
+.preview .doc{width:64px;height:64px;border-radius:9px;display:grid;place-items:center;
+  background:#e2e8f0;font-size:26px}
+.preview .info{flex:1;min-width:0}
+.preview .info .nm{font-size:13px;font-weight:600;word-break:break-all;color:#334155}
+.preview .info .sz{font-size:12px;color:var(--muted)}
+.preview .del{border:none;background:#fee2e2;color:var(--danger);width:32px;height:32px;
+  border-radius:9px;font-size:17px;cursor:pointer;flex:0 0 32px;line-height:1}
+
+.alt-toggle{width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+  padding:15px;border-radius:14px;border:2px dashed #fbbf24;background:#fffbeb;
+  font-family:inherit;cursor:pointer;transition:.2s;color:#92400e}
+.alt-toggle.active{border-style:solid;border-color:var(--warn);background:#fef3c7;
+  box-shadow:0 0 0 4px rgba(217,119,6,.1)}
+.alt-toggle .ico{font-size:22px;flex:0 0 auto}
+.alt-toggle .txt{flex:1}
+.alt-toggle .txt strong{display:block;font-size:14px;font-weight:700}
+.alt-toggle .txt small{display:block;font-size:12px;opacity:.85;font-weight:500}
+.alt-toggle .chev{font-size:22px;transition:.3s;opacity:.6}
+.alt-toggle.active .chev{transform:rotate(90deg)}
+
+.bottom{position:fixed;left:0;right:0;bottom:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,#fff 60%,rgba(255,255,255,0));z-index:30}
+.bottom .inner{max-width:640px;margin:0 auto}
+.btn{width:100%;padding:17px;border:none;border-radius:14px;font-size:17px;
+  font-family:inherit;font-weight:700;cursor:pointer;transition:.2s}
+.btn.primary{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;
+  box-shadow:0 8px 22px rgba(13,148,136,.35)}
+.btn.primary:active{transform:scale(.985)}
+.btn:disabled{background:#e2e8f0 !important;color:#94a3b8 !important;
+  box-shadow:none !important;cursor:not-allowed;transform:none !important}
+.hint{text-align:center;font-size:12.5px;color:var(--muted);margin:9px 0 0}
+
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:99;
+  display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)}
+.overlay .box{background:#fff;border-radius:18px;padding:28px 24px;text-align:center;
+  max-width:340px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.spinner{width:46px;height:46px;margin:0 auto 16px;border:4px solid #ccfbf1;
+  border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay .box p{margin:0;font-size:15px;font-weight:600;color:#334155}
+.big-ok{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#dcfce7;
+  display:grid;place-items:center;font-size:32px}
+.big-err{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#fee2e2;
+  display:grid;place-items:center;font-size:32px}
+.big-warn{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#fef3c7;
+  display:grid;place-items:center;font-size:34px;
+  animation:pulseWarn 1.2s ease infinite}
+@keyframes pulseWarn{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(217,119,6,.35)}
+  50%{transform:scale(1.05);box-shadow:0 0 0 12px rgba(217,119,6,0)}
+}
+.overlay h3{margin:0 0 6px;font-size:17px}
+.overlay h3.warn-title{color:#b45309}
+.overlay .sub{font-size:13.5px;color:var(--muted);margin:0 0 18px;word-break:break-word}
+.overlay .sub.dup-name{color:#92400e;font-weight:700;font-size:14px;
+  background:#fffbeb;border:1px dashed #fbbf24;border-radius:9px;padding:9px}
+.overlay .ok-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--brand);
+  color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.overlay .ok-btn.warn-btn{background:var(--warn);box-shadow:0 6px 16px rgba(217,119,6,.3)}
+.overlay a.folder-link{display:block;margin-bottom:14px;font-size:13px;color:var(--brand-2);
+  word-break:break-all}
+
+#errBox{position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;
+  padding:12px 16px;font-size:13px;z-index:999;font-family:monospace;
+  white-space:pre-wrap;word-break:break-all;max-height:40vh;overflow:auto}
+#errBox button{position:absolute;top:8px;right:10px;background:rgba(255,255,255,.2);
+  border:none;color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<section id="loginScreen" class="screen active">
+  <div class="login-card">
+    <div class="logo">🔐</div>
+    <h1>ဝင်ရောက်ရန် ကုဒ် ထည့်ပါ</h1>
+    <p>ခွင့်ပြုထားသော ကုဒ် (၆) လုံး ရိုက်ထည့်ပါ</p>
+    <input id="codeInput" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+    <div id="loginError" class="hidden">ကုဒ် မှားနေပါသည်။ ပြန်လည် ကြိုးစားပါ။</div>
+    <br>
+    <button id="loginBtn" class="btn primary">ဝင်မည်</button>
+  </div>
+</section>
+
+<!-- ================= FORM ================= -->
+<section id="formScreen" class="screen">
+  <div class="topbar">
+    <div class="title">📋 ဖောက်သည် အချက်အလက်</div>
+    <button id="logoutBtn" class="logout">ထွက်</button>
+  </div>
+
+  <div class="wrap">
+
+    <!-- Customer Name -->
+    <div class="card">
+      <div class="card-title">ဖောက်သည် အချက်အလက်</div>
+      <label class="lbl" for="customerName">Customer အမည် <span class="req">*</span></label>
+      <input id="customerName" type="text" placeholder="ဖောက်သည် အမည် ရိုက်ထည့်ပါ" autocomplete="off">
+      <div class="name-error hidden" id="nameError">
+        <span class="ic">⚠️</span>
+        <span id="nameErrorText">အမည်တူနေပါသည်။ အမည် ပြောင်းလဲပါ။</span>
+      </div>
+      <p class="hint" style="text-align:left;margin-top:8px">
+        ℹ️ ဤအမည်သည် Drive Folder အမည် ဖြစ်ပါမည်။ အမည်တူ Folder ရှိပြီးသားဆိုရင် ခွင့်မပြုပါ။
+      </p>
+    </div>
+
+    <!-- NRC -->
+    <div class="card" id="nrcCard">
+      <div class="card-title">မှတ်ပုံတင် / အထောက်အထား</div>
+
+      <div class="field">
+        <label class="lbl">NRC အရှေ့ <span class="req">*</span></label>
+        <label class="upload" id="up-nrcFront">
+          <input type="file" accept="image/*,.pdf" hidden data-key="nrcFront">
+          <span class="ico">🪪</span>
+          <span class="meta"><strong>ဓာတ်ပုံ ရွေးချယ်ရန်</strong>
+          <small>နှိပ်၍ ဓာတ်ပုံ / ဖိုင် ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-nrcFront"></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">NRC အနောက် <span class="req">*</span></label>
+        <label class="upload" id="up-nrcBack">
+          <input type="file" accept="image/*,.pdf" hidden data-key="nrcBack">
+          <span class="ico">🪪</span>
+          <span class="meta"><strong>ဓာတ်ပုံ ရွေးချယ်ရန်</strong>
+          <small>နှိပ်၍ ဓာတ်ပုံ / ဖိုင် ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-nrcBack"></div>
+      </div>
+    </div>
+
+    <!-- Face Photo -->
+    <div class="card">
+      <div class="card-title">မျက်နှာ ဓာတ်ပုံ</div>
+      <div class="field">
+        <label class="lbl" id="faceLbl">မျက်နှာ Face ပုံ <span class="req">*</span></label>
+        <label class="upload face" id="up-facePhoto">
+          <input type="file" accept="image/*" hidden data-key="facePhoto">
+          <span class="ico">😊</span>
+          <span class="meta"><strong>မျက်နှာ ဓာတ်ပုံ ရွေးချယ်ရန်</strong>
+          <small>ရှင်းလင်းသော မျက်နှာပုံ ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-facePhoto"></div>
+      </div>
+    </div>
+
+    <!-- Application Form -->
+    <div class="card">
+      <div class="card-title">Application Form</div>
+      <div class="field">
+        <label class="lbl" id="appFormLbl">Application Form <span class="req">*</span></label>
+        <label class="upload" id="up-appForm">
+          <input type="file" accept="image/*,.pdf" hidden data-key="appForm">
+          <span class="ico">📄</span>
+          <span class="meta"><strong>ဖောက်လွှာ ရွေးချယ်ရန်</strong>
+          <small>နှိပ်၍ ဓာတ်ပုံ / ဖိုင် ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-appForm"></div>
+      </div>
+    </div>
+
+    <!-- Alt toggle -->
+    <div class="card">
+      <button type="button" class="alt-toggle" id="altToggle">
+        <span class="ico">⚠️</span>
+        <span class="txt">
+          <strong>မှတ်ပုံတင် မထင်ရှားပါက</strong>
+          <small>အထောက်အထား ဓာတ်ပုံ တင်ရန် ဤနေရာကို နှိပ်ပါ</small>
+        </span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+
+    <!-- Alt Evidence -->
+    <div class="card hidden" id="altCard">
+      <div class="card-title">အထောက်အထား တင်သွင်းရန်</div>
+
+      <div class="field">
+        <label class="lbl">အထောက်အထား — အရှေ့ <span class="req">*</span></label>
+        <label class="upload" id="up-evFront">
+          <input type="file" accept="image/*,.pdf" hidden data-key="evFront">
+          <span class="ico">📎</span>
+          <span class="meta"><strong>အထောက်အထား ရွေးချယ်ရန်</strong>
+          <small>နှိပ်၍ ဓာတ်ပုံ / ဖိုင် ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-evFront"></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">အထောက်အထား — အနောက် <span class="req">*</span></label>
+        <label class="upload" id="up-evBack">
+          <input type="file" accept="image/*,.pdf" hidden data-key="evBack">
+          <span class="ico">📎</span>
+          <span class="meta"><strong>အထောက်အထား ရွေးချယ်ရန်</strong>
+          <small>နှိပ်၍ ဓာတ်ပုံ / ဖိုင် ရွေးပါ</small></span>
+        </label>
+        <div class="preview hidden" id="pv-evBack"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom">
+    <div class="inner">
+      <button id="submitBtn" class="btn primary" disabled>တင်သွင်းမည်</button>
+      <p class="hint" id="hintText">အကွက် ၅ ခု ပြည့်စုံပါက Button လင်းပါမည်။</p>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   🔴 ERROR HANDLER
+   ============================================================ */
+window.addEventListener('error', function(e){
+  showError('JS Error: ' + (e.message || 'unknown') + '\n' + (e.filename || '') + ':' + (e.lineno || ''));
+});
+function showError(msg){
+  let box = document.getElementById('errBox');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'errBox';
+    box.innerHTML = '<button onclick="this.parentNode.remove()">ပိတ်</button><div id="errMsg"></div>';
+    document.body.appendChild(box);
+  }
+  document.getElementById('errMsg').textContent += msg + '\n';
+}
+
+/* ============================================================
+   ⚙️ SETTINGS
+   ============================================================ */
+const ACCESS_CODE = "000000";
+
+/* 👇 သင့် Apps Script Web App URL ကို ဒီနေရာမှာ ထည့်ပါ 👇 */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytSYKtZBINCSsgHTjeVl1vTUCrw_ns6tV3V3ku5-v4asbSBXl8PfkCKdN5PIK3egMJfQ/exec";
+
+/* ============================================================
+   🔐 SAFE STORAGE
+   ============================================================ */
+const store = {
+  get: function(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { sessionStorage.setItem(k,v); return true; } catch(e){ return false; } },
+  remove: function(k){ try { sessionStorage.removeItem(k); } catch(e){} }
+};
+
+/* ============================================================
+   🔐 LOGIN
+   ============================================================ */
+const loginScreen = document.getElementById('loginScreen');
+const formScreen  = document.getElementById('formScreen');
+const codeInput   = document.getElementById('codeInput');
+const loginError  = document.getElementById('loginError');
+const loginBtn    = document.getElementById('loginBtn');
+const logoutBtn   = document.getElementById('logoutBtn');
+
+function showFormScreen(){
+  loginScreen.classList.remove('active');
+  formScreen.classList.add('active');
+  window.scrollTo(0,0);
+}
+function showLoginScreen(){
+  formScreen.classList.remove('active');
+  loginScreen.classList.add('active');
+  setTimeout(function(){ codeInput.focus(); }, 200);
+}
+function doLogin(){
+  const val = (codeInput.value || '').trim();
+  if(val === ACCESS_CODE){
+    loginError.classList.add('hidden');
+    store.set('auth_ok','1');
+    showFormScreen();
+  } else {
+    loginError.classList.remove('hidden');
+    codeInput.value = '';
+    codeInput.focus();
+    try {
+      codeInput.animate(
+        [{transform:'translateX(0)'},{transform:'translateX(-8px)'},
+         {transform:'translateX(8px)'},{transform:'translateX(0)'}],
+        {duration:280}
+      );
+    } catch(e){}
+  }
+}
+loginBtn.addEventListener('click', doLogin);
+codeInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doLogin(); });
+codeInput.addEventListener('input', function(){ loginError.classList.add('hidden'); });
+
+logoutBtn.addEventListener('click', function(){
+  store.remove('auth_ok');
+  resetForm();
+  showLoginScreen();
+  codeInput.value = '';
+});
+
+/* ============================================================
+   📁 FILE STATE
+   ============================================================ */
+const F = {
+  nrcFront:null,
+  nrcBack:null,
+  facePhoto:null,
+  appForm:null,
+  evFront:null,
+  evBack:null
+};
+const blobUrls = {};
+
+const nameInput    = document.getElementById('customerName');
+const nameError    = document.getElementById('nameError');
+const nameErrText  = document.getElementById('nameErrorText');
+const submitBtn    = document.getElementById('submitBtn');
+const hintText     = document.getElementById('hintText');
+const altToggle    = document.getElementById('altToggle');
+const altCard      = document.getElementById('altCard');
+const nrcCard      = document.getElementById('nrcCard');
+const appFormLbl   = document.getElementById('appFormLbl');
+const faceLbl      = document.getElementById('faceLbl');
+
+let altMode = false;
+
+function humanSize(b){
+  if(b < 1024) return b + ' B';
+  if(b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(2) + ' MB';
+}
+function extOf(name){
+  const i = name.lastIndexOf('.');
+  return i > -1 ? name.slice(i).toLowerCase() : '';
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function showNameError(msg){
+  nameErrText.textContent = msg;
+  nameError.classList.remove('hidden');
+  nameInput.classList.add('error');
+  nameError.style.animation = 'none';
+  void nameError.offsetWidth;
+  nameError.style.animation = '';
+}
+function hideNameError(){
+  nameError.classList.add('hidden');
+  nameInput.classList.remove('error');
+}
+
+function bindFileInputs(){
+  document.querySelectorAll('input[type=file][data-key]').forEach(function(inp){
+    if(inp.dataset.bound === '1') return;
+    inp.dataset.bound = '1';
+    inp.addEventListener('change', function(){
+      const key  = inp.dataset.key;
+      const file = inp.files[0];
+      if(!file) return;
+      F[key] = file;
+      renderPreview(key, file);
+      updateState();
+    });
+  });
+}
+
+function renderPreview(key, file){
+  const box = document.getElementById('pv-' + key);
+  const up  = document.getElementById('up-' + key);
+  if(!box || !up) return;
+
+  if(blobUrls[key]) { try { URL.revokeObjectURL(blobUrls[key]); } catch(e){} }
+
+  const isImg = file.type.indexOf('image/') === 0;
+  let thumbHtml;
+  if(isImg){
+    const url = URL.createObjectURL(file);
+    blobUrls[key] = url;
+    thumbHtml = '<img src="' + url + '" alt="">';
+  } else {
+    thumbHtml = '<div class="doc">📄</div>';
+  }
+
+  box.innerHTML =
+    thumbHtml +
+    '<div class="info">' +
+      '<div class="nm">' + escapeHtml(file.name) + '</div>' +
+      '<div class="sz">' + humanSize(file.size) + '</div>' +
+    '</div>' +
+    '<button type="button" class="del" data-del="' + key + '" title="ဖျက်ရန်">✕</button>';
+
+  box.classList.remove('hidden');
+  up.classList.add('filled');
+
+  box.querySelector('[data-del]').addEventListener('click', function(e){
+    e.preventDefault();
+    clearField(key);
+  });
+}
+
+function clearField(key){
+  F[key] = null;
+  const box = document.getElementById('pv-' + key);
+  const up  = document.getElementById('up-' + key);
+  if(box){ box.classList.add('hidden'); box.innerHTML = ''; }
+  if(up){
+    up.classList.remove('filled');
+    const inp = up.querySelector('input[type=file]');
+    if(inp){ inp.value = ''; }
+  }
+  if(blobUrls[key]){
+    try { URL.revokeObjectURL(blobUrls[key]); } catch(e){}
+    delete blobUrls[key];
+  }
+  updateState();
+}
+
+function resetForm(){
+  nameInput.value = '';
+  hideNameError();
+  ['nrcFront','nrcBack','facePhoto','appForm','evFront','evBack'].forEach(function(k){
+    clearField(k);
+  });
+  altMode = false;
+  altToggle.classList.remove('active');
+  altCard.classList.add('hidden');
+  nrcCard.classList.remove('hidden');
+  appFormLbl.innerHTML = 'Application Form <span class="req">*</span>';
+  faceLbl.innerHTML = 'မျက်နှာ Face ပုံ <span class="req">*</span>';
+  updateState();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+altToggle.addEventListener('click', function(){
+  altMode = !altMode;
+  altToggle.classList.toggle('active', altMode);
+  altCard.classList.toggle('hidden', !altMode);
+  nrcCard.classList.toggle('hidden', altMode);
+
+  if(altMode){
+    appFormLbl.innerHTML = 'Application Form <span class="opt">(မဖြစ်မနေ မဟုတ်)</span>';
+  } else {
+    appFormLbl.innerHTML = 'Application Form <span class="req">*</span>';
+  }
+  updateState();
+  if(altMode) altCard.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+nameInput.addEventListener('input', function(){
+  if(!nameError.classList.contains('hidden')) hideNameError();
+  updateState();
+});
+
+function updateState(){
+  const hasName = nameInput.value.trim().length > 0;
+  const hasFace = !!F.facePhoto;
+  let ok = false;
+
+  if(altMode){
+    ok = hasName && hasFace && !!F.evFront && !!F.evBack;
+    hintText.textContent = ok
+      ? '✅ အားလုံး ပြည့်စုံပါပြီ။ တင်သွင်းမည် ကို နှိပ်ပါ။'
+      : 'အမည် + Face ပုံ + အထောက်အထား အရှေ့/အနောက် ပြည့်စုံပါက Button လင်းပါမည်။';
+  } else {
+    ok = hasName && !!F.nrcFront && !!F.nrcBack && hasFace && !!F.appForm;
+    hintText.textContent = ok
+      ? '✅ အကွက် ၅ ခု ပြည့်စုံပါပြီ။ တင်သွင်းမည် ကို နှိပ်ပါ။'
+      : 'အကွက် ၅ ခု ပြည့်စုံပါက Button လင်းပါမည်။';
+  }
+
+  submitBtn.disabled = !ok;
+}
+
+function fileToBase64(file){
+  return new Promise(function(resolve, reject){
+    const r = new FileReader();
+    r.onload  = function(){ resolve(String(r.result).split(',')[1]); };
+    r.onerror = function(){ reject(new Error('ဖိုင် ဖတ်မရပါ: ' + file.name)); };
+    r.readAsDataURL(file);
+  });
+}
+
+async function packFile(label, file){
+  if(!file) return null;
+  const ts = new Date().toISOString().replace(/[:.]/g,'-');
+  return {
+    label: label,
+    name: label + '_' + ts + extOf(file.name),
+    mimeType: file.type || 'application/octet-stream',
+    data: await fileToBase64(file)
+  };
+}
+
+submitBtn.addEventListener('click', async function(){
+  if(submitBtn.disabled) return;
+
+  const customerName = nameInput.value.trim();
+  if(!customerName){
+    showResult(false, 'အမည် မပါရှိပါ', 'Customer အမည် ရိုက်ထည့်ပါ။');
+    return;
+  }
+
+  if(WEB_APP_URL.indexOf('xxxxxxxx') > -1){
+    showResult(false, 'Web App URL မထည့်ရသေးပါ',
+      'HTML ထဲရှိ WEB_APP_URL နေရာတွင် Apps Script URL ကို အစားထိုးပါ။');
+    return;
+  }
+
+  showLoading('အမည် စစ်ဆေးနေပါသည်...');
+
+  try {
+    const files = [];
+
+    if(altMode){
+      const a = await packFile('Evidence_Front',  F.evFront);  if(a) files.push(a);
+      const b = await packFile('Evidence_Back',   F.evBack);   if(b) files.push(b);
+      const f = await packFile('Face_Photo',      F.facePhoto); if(f) files.push(f);
+      if(F.appForm){
+        const c = await packFile('Application_Form', F.appForm); if(c) files.push(c);
+      }
+    } else {
+      const a = await packFile('NRC_Front',        F.nrcFront);  if(a) files.push(a);
+      const b = await packFile('NRC_Back',         F.nrcBack);   if(b) files.push(b);
+      const f = await packFile('Face_Photo',       F.facePhoto); if(f) files.push(f);
+      const c = await packFile('Application_Form', F.appForm);   if(c) files.push(c);
+    }
+
+    setLoadingText('Google Drive သို့ တင်နေပါသည်...');
+
+    const payload = {
+      code: ACCESS_CODE,
+      customerName: customerName,
+      mode: altMode ? 'alternative' : 'normal',
+      files: files
+    };
+
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const out = await res.json();
+
+    /* 🔔 အမည်တူ ဖြစ်နေရင် */
+    if(out.duplicate){
+      removeOverlay();
+      showNameError(out.message || 'အမည်တူနေပါသည်။ အမည် ပြောင်းလဲပါ။');
+      showDuplicateNotify(customerName, out.message);
+      return;
+    }
+
+    if(out.ok){
+      showResult(true, 'တင်သွင်းမှု အောင်မြင်ပါသည်',
+        'Folder: ' + out.folder + ' — ဖိုင် ' + out.files.length + ' ခု တင်ပြီးပါပြီ။',
+        out.folderUrl, true);
+    } else {
+      showResult(false, 'မအောင်မြင်ပါ', out.message || 'ပြန်လည် ကြိုးစားပါ။');
+    }
+
+  } catch(err){
+    showResult(false, 'Error ဖြစ်ပွားပါသည်', String(err.message || err));
+  }
+});
+
+/* ============================================================
+   🔔 အမည်တူ Notification
+   ============================================================ */
+function showDuplicateNotify(name, msg){
+  removeOverlay();
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'overlay';
+  overlayEl.innerHTML = '<div class="box">' +
+      '<div class="big-warn">⚠️</div>' +
+      '<h3 class="warn-title">အမည်တူနေပါသည်</h3>' +
+      '<p class="sub dup-name">"' + escapeHtml(name) + '"</p>' +
+      '<p class="sub">' + escapeHtml(msg || 'အမည် ပြောင်းလဲပြီး ပြန်လည် ကြိုးစားပါ။') + '</p>' +
+      '<button class="ok-btn warn-btn" id="ovClose">အမည် ပြောင်းမည်</button>' +
+    '</div>';
+  document.body.appendChild(overlayEl);
+
+  document.getElementById('ovClose').addEventListener('click', function(){
+    removeOverlay();
+    nameInput.value = '';
+    hideNameError();
+    updateState();
+    nameInput.focus();
+    nameInput.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+}
+
+/* ============================================================
+   🪟 OVERLAY
+   ============================================================ */
+let overlayEl = null;
+function removeOverlay(){ if(overlayEl){ overlayEl.remove(); overlayEl = null; } }
+
+function showLoading(text){
+  removeOverlay();
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'overlay';
+  overlayEl.innerHTML = '<div class="box">' +
+      '<div class="spinner"></div>' +
+      '<p id="ovText">' + escapeHtml(text) + '</p>' +
+    '</div>';
+  document.body.appendChild(overlayEl);
+}
+function setLoadingText(t){
+  const el = document.getElementById('ovText');
+  if(el) el.textContent = t;
+}
+function showResult(ok, title, sub, link, showReset){
+  removeOverlay();
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'overlay';
+  overlayEl.innerHTML = '<div class="box">' +
+      '<div class="' + (ok ? 'big-ok' : 'big-err') + '">' + (ok ? '✅' : '❌') + '</div>' +
+      '<h3>' + escapeHtml(title) + '</h3>' +
+      '<p class="sub">' + escapeHtml(sub || '') + '</p>' +
+      (link ? '<a class="folder-link" href="' + link + '" target="_blank" rel="noopener">📂 Drive Folder ကို ကြည့်ရန်</a>' : '') +
+      '<button class="ok-btn" id="ovClose">' + (ok ? 'ပြီးပါပြီ — Form အသစ် စမည်' : 'ပြန်စမည်') + '</button>' +
+    '</div>';
+  document.body.appendChild(overlayEl);
+
+  document.getElementById('ovClose').addEventListener('click', function(){
+    removeOverlay();
+    if(ok && showReset){ resetForm(); }
+  });
+}
+
+function init(){
+  bindFileInputs();
+  updateState();
+  if(store.get('auth_ok') === '1') showFormScreen();
+  else showLoginScreen();
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
