@@ -12,13 +12,13 @@
   --radius:16px; --shadow:0 10px 30px rgba(15,23,42,.08);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:"Pyidaungsu","Noto Sans Myanmar","Myanmar Text",system-ui,sans-serif;
+body{margin:0;font-family:"Pyidaungsu","Noto Sans Myanmar","Myanmar Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65}
 .hidden{display:none !important}
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 #loginScreen{align-items:center;justify-content:center;padding:24px;
   background:linear-gradient(160deg,#0f766e 0%,#0d9488 45%,#14b8a6 100%)}
 .login-card{width:100%;max-width:400px;background:#fff;border-radius:22px;
@@ -35,7 +35,7 @@ body{margin:0;font-family:"Pyidaungsu","Noto Sans Myanmar","Myanmar Text",system
 #loginError{margin-top:12px;color:var(--danger);font-size:14px;font-weight:600;
   background:#fef2f2;border-radius:10px;padding:9px}
 
-/* TOPBAR */
+/* ================= TOPBAR ================= */
 .topbar{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;
   padding:16px 18px;display:flex;align-items:center;justify-content:space-between;
   position:sticky;top:0;z-index:20;box-shadow:0 4px 18px rgba(15,118,110,.3)}
@@ -44,7 +44,7 @@ body{margin:0;font-family:"Pyidaungsu","Noto Sans Myanmar","Myanmar Text",system
   padding:7px 14px;border-radius:10px;font-size:13px;font-family:inherit;cursor:pointer}
 .logout:active{background:rgba(255,255,255,.3)}
 
-/* CARD */
+/* ================= CARD ================= */
 .wrap{padding:16px 14px 130px;max-width:640px;margin:0 auto;width:100%}
 .card{background:#fff;border-radius:var(--radius);padding:18px;
   box-shadow:var(--shadow);margin-bottom:14px}
@@ -74,7 +74,7 @@ input[type=text].error{border-color:var(--danger);background:#fef2f2;
   75%{transform:translateX(5px)}
 }
 
-/* UPLOAD */
+/* ================= UPLOAD ================= */
 .field{margin-bottom:16px}
 .field:last-child{margin-bottom:0}
 .upload{display:flex;align-items:center;gap:12px;padding:16px 15px;
@@ -170,7 +170,7 @@ input[type=text].error{border-color:var(--danger);background:#fef2f2;
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- ================= LOGIN SCREEN ================= -->
 <section id="loginScreen" class="screen active">
   <div class="login-card">
     <div class="logo">🔐</div>
@@ -183,7 +183,7 @@ input[type=text].error{border-color:var(--danger);background:#fef2f2;
   </div>
 </section>
 
-<!-- ================= FORM ================= -->
+<!-- ================= FORM SCREEN ================= -->
 <section id="formScreen" class="screen">
   <div class="topbar">
     <div class="title">📋 ဖောက်သည် အချက်အလက်</div>
@@ -320,7 +320,7 @@ window.addEventListener('error', function(e){
   showError('JS Error: ' + (e.message || 'unknown') + '\n' + (e.filename || '') + ':' + (e.lineno || ''));
 });
 function showError(msg){
-  let box = document.getElementById('errBox');
+  var box = document.getElementById('errBox');
   if(!box){
     box = document.createElement('div');
     box.id = 'errBox';
@@ -331,17 +331,16 @@ function showError(msg){
 }
 
 /* ============================================================
-   ⚙️ SETTINGS
+   ⚙️ SETTINGS — သင့် URL နဲ့ CODE ထည့်ပြီး
    ============================================================ */
-const ACCESS_CODE = "000000";
+var ACCESS_CODE = "008915";
 
-/* 👇 သင့် Apps Script Web App URL ကို ဒီနေရာမှာ ထည့်ပါ 👇 */
-const WEB_APP_URL = "const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWn5bey0yjTK0Z1ndgR0hM6iJWEUx-4uJFZ-Uw1FYCoY7PD5dUNhSQTBtcO9NIYttI5w/exec";
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWn5bey0yjTK0Z1ndgR0hM6iJWEUx-4uJFZ-Uw1FYCoY7PD5dUNhSQTBtcO9NIYttI5w/exec";
 
 /* ============================================================
    🔐 SAFE STORAGE
    ============================================================ */
-const store = {
+var store = {
   get: function(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } },
   set: function(k,v){ try { sessionStorage.setItem(k,v); return true; } catch(e){ return false; } },
   remove: function(k){ try { sessionStorage.removeItem(k); } catch(e){} }
@@ -350,12 +349,12 @@ const store = {
 /* ============================================================
    🔐 LOGIN
    ============================================================ */
-const loginScreen = document.getElementById('loginScreen');
-const formScreen  = document.getElementById('formScreen');
-const codeInput   = document.getElementById('codeInput');
-const loginError  = document.getElementById('loginError');
-const loginBtn    = document.getElementById('loginBtn');
-const logoutBtn   = document.getElementById('logoutBtn');
+var loginScreen = document.getElementById('loginScreen');
+var formScreen  = document.getElementById('formScreen');
+var codeInput   = document.getElementById('codeInput');
+var loginError  = document.getElementById('loginError');
+var loginBtn    = document.getElementById('loginBtn');
+var logoutBtn   = document.getElementById('logoutBtn');
 
 function showFormScreen(){
   loginScreen.classList.remove('active');
@@ -368,7 +367,7 @@ function showLoginScreen(){
   setTimeout(function(){ codeInput.focus(); }, 200);
 }
 function doLogin(){
-  const val = (codeInput.value || '').trim();
+  var val = (codeInput.value || '').trim();
   if(val === ACCESS_CODE){
     loginError.classList.add('hidden');
     store.set('auth_ok','1');
@@ -400,7 +399,7 @@ logoutBtn.addEventListener('click', function(){
 /* ============================================================
    📁 FILE STATE
    ============================================================ */
-const F = {
+var F = {
   nrcFront:null,
   nrcBack:null,
   facePhoto:null,
@@ -408,20 +407,20 @@ const F = {
   evFront:null,
   evBack:null
 };
-const blobUrls = {};
+var blobUrls = {};
 
-const nameInput    = document.getElementById('customerName');
-const nameError    = document.getElementById('nameError');
-const nameErrText  = document.getElementById('nameErrorText');
-const submitBtn    = document.getElementById('submitBtn');
-const hintText     = document.getElementById('hintText');
-const altToggle    = document.getElementById('altToggle');
-const altCard      = document.getElementById('altCard');
-const nrcCard      = document.getElementById('nrcCard');
-const appFormLbl   = document.getElementById('appFormLbl');
-const faceLbl      = document.getElementById('faceLbl');
+var nameInput    = document.getElementById('customerName');
+var nameError    = document.getElementById('nameError');
+var nameErrText  = document.getElementById('nameErrorText');
+var submitBtn    = document.getElementById('submitBtn');
+var hintText     = document.getElementById('hintText');
+var altToggle    = document.getElementById('altToggle');
+var altCard      = document.getElementById('altCard');
+var nrcCard      = document.getElementById('nrcCard');
+var appFormLbl   = document.getElementById('appFormLbl');
+var faceLbl      = document.getElementById('faceLbl');
 
-let altMode = false;
+var altMode = false;
 
 function humanSize(b){
   if(b < 1024) return b + ' B';
@@ -429,7 +428,7 @@ function humanSize(b){
   return (b/1048576).toFixed(2) + ' MB';
 }
 function extOf(name){
-  const i = name.lastIndexOf('.');
+  var i = name.lastIndexOf('.');
   return i > -1 ? name.slice(i).toLowerCase() : '';
 }
 function escapeHtml(s){
@@ -452,31 +451,35 @@ function hideNameError(){
 }
 
 function bindFileInputs(){
-  document.querySelectorAll('input[type=file][data-key]').forEach(function(inp){
-    if(inp.dataset.bound === '1') return;
+  var inputs = document.querySelectorAll('input[type=file][data-key]');
+  for(var i=0; i<inputs.length; i++){
+    var inp = inputs[i];
+    if(inp.dataset.bound === '1') continue;
     inp.dataset.bound = '1';
-    inp.addEventListener('change', function(){
-      const key  = inp.dataset.key;
-      const file = inp.files[0];
-      if(!file) return;
-      F[key] = file;
-      renderPreview(key, file);
-      updateState();
-    });
-  });
+    inp.addEventListener('change', (function(input){
+      return function(){
+        var key  = input.dataset.key;
+        var file = input.files[0];
+        if(!file) return;
+        F[key] = file;
+        renderPreview(key, file);
+        updateState();
+      };
+    })(inp));
+  }
 }
 
 function renderPreview(key, file){
-  const box = document.getElementById('pv-' + key);
-  const up  = document.getElementById('up-' + key);
+  var box = document.getElementById('pv-' + key);
+  var up  = document.getElementById('up-' + key);
   if(!box || !up) return;
 
   if(blobUrls[key]) { try { URL.revokeObjectURL(blobUrls[key]); } catch(e){} }
 
-  const isImg = file.type.indexOf('image/') === 0;
-  let thumbHtml;
+  var isImg = file.type.indexOf('image/') === 0;
+  var thumbHtml;
   if(isImg){
-    const url = URL.createObjectURL(file);
+    var url = URL.createObjectURL(file);
     blobUrls[key] = url;
     thumbHtml = '<img src="' + url + '" alt="">';
   } else {
@@ -502,12 +505,12 @@ function renderPreview(key, file){
 
 function clearField(key){
   F[key] = null;
-  const box = document.getElementById('pv-' + key);
-  const up  = document.getElementById('up-' + key);
+  var box = document.getElementById('pv-' + key);
+  var up  = document.getElementById('up-' + key);
   if(box){ box.classList.add('hidden'); box.innerHTML = ''; }
   if(up){
     up.classList.remove('filled');
-    const inp = up.querySelector('input[type=file]');
+    var inp = up.querySelector('input[type=file]');
     if(inp){ inp.value = ''; }
   }
   if(blobUrls[key]){
@@ -520,9 +523,8 @@ function clearField(key){
 function resetForm(){
   nameInput.value = '';
   hideNameError();
-  ['nrcFront','nrcBack','facePhoto','appForm','evFront','evBack'].forEach(function(k){
-    clearField(k);
-  });
+  var keys = ['nrcFront','nrcBack','facePhoto','appForm','evFront','evBack'];
+  for(var i=0; i<keys.length; i++){ clearField(keys[i]); }
   altMode = false;
   altToggle.classList.remove('active');
   altCard.classList.add('hidden');
@@ -554,9 +556,9 @@ nameInput.addEventListener('input', function(){
 });
 
 function updateState(){
-  const hasName = nameInput.value.trim().length > 0;
-  const hasFace = !!F.facePhoto;
-  let ok = false;
+  var hasName = nameInput.value.trim().length > 0;
+  var hasFace = !!F.facePhoto;
+  var ok = false;
 
   if(altMode){
     ok = hasName && hasFace && !!F.evFront && !!F.evBack;
@@ -575,7 +577,7 @@ function updateState(){
 
 function fileToBase64(file){
   return new Promise(function(resolve, reject){
-    const r = new FileReader();
+    var r = new FileReader();
     r.onload  = function(){ resolve(String(r.result).split(',')[1]); };
     r.onerror = function(){ reject(new Error('ဖိုင် ဖတ်မရပါ: ' + file.name)); };
     r.readAsDataURL(file);
@@ -584,7 +586,7 @@ function fileToBase64(file){
 
 async function packFile(label, file){
   if(!file) return null;
-  const ts = new Date().toISOString().replace(/[:.]/g,'-');
+  var ts = new Date().toISOString().replace(/[:.]/g,'-');
   return {
     label: label,
     name: label + '_' + ts + extOf(file.name),
@@ -596,7 +598,7 @@ async function packFile(label, file){
 submitBtn.addEventListener('click', async function(){
   if(submitBtn.disabled) return;
 
-  const customerName = nameInput.value.trim();
+  var customerName = nameInput.value.trim();
   if(!customerName){
     showResult(false, 'အမည် မပါရှိပါ', 'Customer အမည် ရိုက်ထည့်ပါ။');
     return;
@@ -611,38 +613,38 @@ submitBtn.addEventListener('click', async function(){
   showLoading('အမည် စစ်ဆေးနေပါသည်...');
 
   try {
-    const files = [];
+    var files = [];
 
     if(altMode){
-      const a = await packFile('Evidence_Front',  F.evFront);  if(a) files.push(a);
-      const b = await packFile('Evidence_Back',   F.evBack);   if(b) files.push(b);
-      const f = await packFile('Face_Photo',      F.facePhoto); if(f) files.push(f);
+      var a = await packFile('Evidence_Front',  F.evFront);  if(a) files.push(a);
+      var b = await packFile('Evidence_Back',   F.evBack);   if(b) files.push(b);
+      var f = await packFile('Face_Photo',      F.facePhoto); if(f) files.push(f);
       if(F.appForm){
-        const c = await packFile('Application_Form', F.appForm); if(c) files.push(c);
+        var c = await packFile('Application_Form', F.appForm); if(c) files.push(c);
       }
     } else {
-      const a = await packFile('NRC_Front',        F.nrcFront);  if(a) files.push(a);
-      const b = await packFile('NRC_Back',         F.nrcBack);   if(b) files.push(b);
-      const f = await packFile('Face_Photo',       F.facePhoto); if(f) files.push(f);
-      const c = await packFile('Application_Form', F.appForm);   if(c) files.push(c);
+      var a2 = await packFile('NRC_Front',        F.nrcFront);  if(a2) files.push(a2);
+      var b2 = await packFile('NRC_Back',         F.nrcBack);   if(b2) files.push(b2);
+      var f2 = await packFile('Face_Photo',       F.facePhoto); if(f2) files.push(f2);
+      var c2 = await packFile('Application_Form', F.appForm);   if(c2) files.push(c2);
     }
 
     setLoadingText('Google Drive သို့ တင်နေပါသည်...');
 
-    const payload = {
+    var payload = {
       code: ACCESS_CODE,
       customerName: customerName,
       mode: altMode ? 'alternative' : 'normal',
       files: files
     };
 
-    const res = await fetch(WEB_APP_URL, {
+    var res = await fetch(WEB_APP_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
 
-    const out = await res.json();
+    var out = await res.json();
 
     /* 🔔 အမည်တူ ဖြစ်နေရင် */
     if(out.duplicate){
@@ -694,7 +696,7 @@ function showDuplicateNotify(name, msg){
 /* ============================================================
    🪟 OVERLAY
    ============================================================ */
-let overlayEl = null;
+var overlayEl = null;
 function removeOverlay(){ if(overlayEl){ overlayEl.remove(); overlayEl = null; } }
 
 function showLoading(text){
@@ -708,7 +710,7 @@ function showLoading(text){
   document.body.appendChild(overlayEl);
 }
 function setLoadingText(t){
-  const el = document.getElementById('ovText');
+  var el = document.getElementById('ovText');
   if(el) el.textContent = t;
 }
 function showResult(ok, title, sub, link, showReset){
@@ -730,12 +732,16 @@ function showResult(ok, title, sub, link, showReset){
   });
 }
 
+/* ============================================================
+   🚀 INIT — Login screen ကို အမြဲ ပြမယ်
+   ============================================================ */
 function init(){
   bindFileInputs();
   updateState();
-  if(store.get('auth_ok') === '1') showFormScreen();
-  else showLoginScreen();
+  /* sessionStorage ကို မစစ်တော့ဘူး — Login screen အမြဲ ပြမယ် */
+  showLoginScreen();
 }
+
 if(document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', init);
 } else {
